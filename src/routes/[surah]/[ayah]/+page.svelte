@@ -8,14 +8,12 @@
 		if (counter < data.ayah.words.length) {
 			counter++
 		}
-		console.log('increaseCounter', counter)
 	}
 
 	const decreaseCounter = () => {
 		if (counter > 0) {
 			counter--
 		}
-		console.log('decreaseCounter', counter)
 	}
 
 	const nextAyah = () => {
@@ -31,7 +29,7 @@
 	}
 </script>
 
-<div class="fixed top-0 left-0 right-0 p-4 flex flex-row justify-between items-center text-neutral-800 bg-white border-b-4 border-green-500">
+<div class="max-w-lg mx-auto fixed top-0 left-0 right-0 p-4 flex flex-row justify-between items-center text-neutral-800 bg-white border-b-4 border-green-500">
 	<div class="flex flex-row items-center gap-4">
 		<a href="/">
 			<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -77,7 +75,7 @@
 
 </div>
 
-<div class="fixed bottom-0 left-0 right-0 h-16 bg-white flex flex-row justify-between items-center gap-2 px-3 border-t-4 border-green-500">
+<div class="max-w-lg mx-auto fixed bottom-0 left-0 right-0 h-16 bg-white flex flex-row justify-between items-center gap-2 px-3 border-t-4 border-green-500">
 	<div on:click={previousAyah} class={`p-2 ${parseInt(data.params.ayah) > 1 ? 'text-neutral-900' : 'text-neutral-400'}`}>
 		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
 		  <path stroke-linecap="round" stroke-linejoin="round" d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5" />
