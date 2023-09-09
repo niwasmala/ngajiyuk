@@ -1,6 +1,5 @@
 <script>
 	export let data
-	console.log(data)
 
 	let counter = 1
 	let words = 2
