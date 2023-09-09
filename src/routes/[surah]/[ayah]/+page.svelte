@@ -145,6 +145,6 @@
 	</div>
 </div>
 
-<audio bind:this={audioElement}>
+<audio bind:this={audioElement} on:ended={() => audioPlaying = false}>
   <source src={`/audio/${audioName}.mp3`} type="audio/mpeg">
 </audio>
