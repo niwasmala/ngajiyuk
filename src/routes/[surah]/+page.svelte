@@ -168,6 +168,6 @@
 	</div>
 </div>
 
-<audio bind:this={audioElement} on:ended={() => audioPlaying = false}>
+<audio bind:this={audioElement} on:ended={nextAyah}>
   <source src={`/audio/${audioName}.mp3`} type="audio/mpeg">
 </audio>

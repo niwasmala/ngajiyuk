@@ -1,4 +1,6 @@
 <script>
+	import { onMount } from "svelte";
+
 	export let data
 
 	let ayah = parseInt(data.params.ayah)
@@ -10,23 +12,45 @@
 
 	$: audioName = ("000" + data.params.surah).slice(-3) + ("000" + data.params.ayah).slice(-3)
 
+	let interval, timer = 0
+
 	const playAudio = () => {
 		if (!audioPlaying) {
+			setCounter(1)
 			audioElement.play()
+
+			const marker = data.ayah.marker;
+			if (marker.length > 0) {
+				interval = window.setInterval(() => {
+					let lastMarker
+					marker.forEach((m, i) => {
+						if (timer >= m) {
+							lastMarker = i
+						}
+					})
+
+					setCounter(lastMarker+1)
+					timer += 500
+
+					if (lastMarker >= marker.length) {
+						timer = 0
+						if (interval) window.clearInterval(interval)
+					}
+				}, 500)
+			}			
 		} else {
 			audioElement.currentTime = 0
 			audioElement.pause()
+
+			timer = 0
+			if (interval) window.clearInterval(interval)
 		}
 
 		audioPlaying = !audioPlaying
 	}
 
-	const increaseCounter = () => {
-		if (counter < data.ayah.arabic.length) {
-			counter++
-		} else {
-			nextAyah()
-		}
+	const setCounter = (c) => {
+		counter = c
 
 		const element = document.getElementById(`word-${counter}`)
 		if (element) {
@@ -38,20 +62,19 @@
 		}
 	}
 
+	const increaseCounter = () => {
+		if (counter < data.ayah.arabic.length) {
+			setCounter(counter+1)
+		} else {
+			nextAyah()
+		}
+	}
+
 	const decreaseCounter = () => {
 		if (counter > 1) {
-			counter--
+			setCounter(counter-1)
 		} else {
 			previousAyah()
-		}
-
-		const element = document.getElementById(`word-${counter}`)
-		if (element) {
-			element.scrollIntoView({
-				behavior: 'smooth',
-				block: 'center',
-				inline: 'center',
-			});
 		}
 	}
 
@@ -145,6 +168,6 @@
 	</div>
 </div>
 
-<audio bind:this={audioElement} on:ended={() => audioPlaying = false}>
+<audio bind:this={audioElement} on:ended={() => { audioPlaying = false; timer = 0; if (interval) window.clearInterval(interval);}}>
   <source src={`/audio/${audioName}.mp3`} type="audio/mpeg">
 </audio>
