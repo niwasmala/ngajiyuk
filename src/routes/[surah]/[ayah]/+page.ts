@@ -1,14 +1,18 @@
 import { error } from '@sveltejs/kit';
 import surah from '$lib/data/surah-info.json';
-import ayah from '$lib/data/word-by-word/78.json';
+import { loadWords } from '$lib/data/words';
 
 /** @type {import('./$types').PageLoad} */
-export function load({ params }) {
+export async function load({ params }) {
   if (!surah[params.surah]) {
     throw error(404, 'Not found');
   }
-  
-  if (!ayah[params.ayah]) {
+
+  let ayah
+  try {
+    ayah = await loadWords(params.surah);
+  } catch (e) {
+    console.error(e)
     throw error(404, 'Not found');
   }
 
