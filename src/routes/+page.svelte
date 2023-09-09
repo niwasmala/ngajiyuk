@@ -11,7 +11,7 @@
 <div class="py-20 min-h-screen flex flex-col gap-12 p-3">
   <div class="grid grid-cols-5 gap-2">
     {#each Object.entries(data.surah) as [index, surat]}
-      <a href={`/${index}`} class="bg-white w-full p-1 border-neutral-300 border-2 flex flex-col items-center">
+      <a href={`/${index}`} class="bg-white w-full p-1 flex flex-col items-center">
         <div class="text-2xl font-bold">
           {index}
         </div>

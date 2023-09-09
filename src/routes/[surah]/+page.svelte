@@ -68,7 +68,7 @@
 <div class="max-w-lg mx-auto fixed z-30 top-0 left-0 right-0 p-4 flex flex-row justify-between items-center text-neutral-800 bg-white border-b-4 border-green-500">
 	<div class="flex flex-row items-center gap-4">
 		<a href="/">
-			<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+			<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
 				<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
 			</svg>
 		</a>
@@ -90,38 +90,29 @@
 			</div>
 			<div class={`self-end flex flex-wrap flex-row-reverse gap-2 font-bold text-5xl pl-4 py-3 text-right leading-loose ${index <= counter ? 'text-neutral-800' : 'text-neutral-300'}`}>
 				{#each ayah as word, idx}
-					<div class={`${idx < words ? 'block' : 'hidden'}`}>
+					<div class={`${idx < words ? 'flex flex-col items-center' : 'hidden'}`}>
 						{word.arabic}
+						<div class="text-sm">
+							{word.transliteration}
+						</div>
 					</div>
 				{/each}
 				<div>
 					{ayah.length > words ? '...' : ''}
 				</div>
 			</div>
-			{#if ayah[0].transliteration}
-				<div class={`self-start flex flex-wrap flex-row font-bold text-4xl py-3 text-right ${index <= counter ? 'text-neutral-800' : 'text-neutral-300'}`}>
-					{#each ayah as word, idx}
-						<div class={`${idx < words ? 'block' : 'hidden'}`}>
-							{word.transliteration}
-						</div>
-					{/each}
-					<div>
-						{ayah.length > words ? '...' : ''}
-					</div>
-				</div>
-			{/if}
 		</a>
 	{/each}
 </div>
 
 <div class="max-w-lg mx-auto fixed z-30 bottom-0 left-0 right-0 h-16 bg-white flex flex-row justify-between items-center gap-2 px-3 border-t-4 border-green-500">
 	<div on:click={previousAyah} class={`cursor-pointer p-2 ${counter > 1 ? 'text-neutral-900' : 'text-neutral-400'}`}>
-		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
 			<path stroke-linecap="round" stroke-linejoin="round" d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5" />
 		</svg>
 	</div>
 	<div on:click={decreaseWords} class={`cursor-pointer p-2 ${words > 2 ? 'text-neutral-900' : 'text-neutral-400'}`}>
-		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
 		  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
 		</svg>
 	</div>
@@ -133,12 +124,12 @@
 		</div>
 	</div>
 	<div on:click={increaseWords} class="cursor-pointer p-2 text-neutral-900">
-		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
 		  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
 		</svg>
 	</div>
 	<div on:click={nextAyah} class="cursor-pointer p-2 text-neutral-900">
-		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
 			<path stroke-linecap="round" stroke-linejoin="round" d="M11.25 4.5l7.5 7.5-7.5 7.5m-6-15l7.5 7.5-7.5 7.5" />
 		</svg>
 	</div>
