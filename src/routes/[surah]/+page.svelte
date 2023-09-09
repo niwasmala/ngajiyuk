@@ -1,5 +1,6 @@
 <script>
 	export let data
+	console.log(data)
 
 	let counter = 1
 	let words = 2
@@ -116,16 +117,16 @@
 				{index}
 			</div>
 			<div class={`self-end flex flex-wrap flex-row-reverse gap-2 font-bold text-5xl pl-4 py-3 text-right leading-loose ${index <= counter ? 'text-neutral-800' : 'text-neutral-300'}`}>
-				{#each ayah as word, idx}
+				{#each ayah.arabic as word, idx}
 					<div class={`${idx < words ? 'flex flex-col items-center' : 'hidden'}`}>
-						{word.arabic}
+						{ayah.arabic[idx]}
 						<div class="text-sm">
-							{word.transliteration}
+							{ayah.latin[idx]}
 						</div>
 					</div>
 				{/each}
 				<div>
-					{ayah.length > words ? '...' : ''}
+					{ayah.arabic.length > words ? '...' : ''}
 				</div>
 			</div>
 		</a>

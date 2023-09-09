@@ -22,7 +22,7 @@
 	}
 
 	const increaseCounter = () => {
-		if (counter < data.ayah.length) {
+		if (counter < data.ayah.arabic.length) {
 			counter++
 		} else {
 			nextAyah()
@@ -95,12 +95,12 @@
 <div class="pt-24 pb-28 min-h-screen flex flex-col gap-12 p-4">
 	<div class="bg-white flex flex-col gap-12 py-6 px-3">
 		<div class="flex flex-row-reverse flex-wrap gap-4">
-			{#each data.ayah as word, index}
+			{#each data.ayah.arabic as word, index}
 				<div class={`${index < counter ? 'text-neutral-800' : 'text-neutral-300'}`}>
 					<div id={`word-${index+1}`} class="font-bold text-6xl text-right leading-loose">
-						{word.arabic}
+						{data.ayah.arabic[index]}
 						<div class="text-lg text-center">
-							{word.transliteration}
+							{data.ayah.latin[index]}
 						</div>
 					</div>
 				</div>

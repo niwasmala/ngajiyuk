@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import surah from '$lib/data/surah-info.json';
+import surah from '$lib/data/surah.json';
 import { loadWords } from '$lib/data/words';
 
 /** @type {import('./$types').PageLoad} */
