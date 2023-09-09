@@ -10,6 +10,6 @@
   <title>Ngaji Yuk</title>
 </svelte:head>
 
-<div class="container max-w-lg mx-auto min-h-screen bg-neutral-100">
+<div class="select-none container max-w-lg mx-auto min-h-screen bg-neutral-100">
   <slot />
 </div>

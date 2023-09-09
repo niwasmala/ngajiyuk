@@ -2,17 +2,39 @@
 	export let data
 
 	let ayah = parseInt(data.params.ayah)
-	let counter = 0
+	let counter = 1
 
 	const increaseCounter = () => {
-		if (counter < data.ayah.words.length) {
+		if (counter < data.ayah.length) {
 			counter++
+		} else {
+			nextAyah()
+		}
+
+		const element = document.getElementById(`word-${counter}`)
+		if (element) {
+			element.scrollIntoView({
+				behavior: 'smooth',
+				block: 'center',
+				inline: 'center',
+			});
 		}
 	}
 
 	const decreaseCounter = () => {
-		if (counter > 0) {
+		if (counter > 1) {
 			counter--
+		} else {
+			previousAyah()
+		}
+
+		const element = document.getElementById(`word-${counter}`)
+		if (element) {
+			element.scrollIntoView({
+				behavior: 'smooth',
+				block: 'center',
+				inline: 'center',
+			});
 		}
 	}
 
@@ -29,7 +51,7 @@
 	}
 </script>
 
-<div class="max-w-lg mx-auto fixed top-0 left-0 right-0 p-4 flex flex-row justify-between items-center text-neutral-800 bg-white border-b-4 border-green-500">
+<div class="max-w-lg mx-auto fixed z-30 top-0 left-0 right-0 p-4 flex flex-row justify-between items-center text-neutral-800 bg-white border-b-4 border-green-500">
 	<div class="flex flex-row items-center gap-4">
 		<a href={`/${data.params.surah}`}>
 			<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -42,7 +64,7 @@
 		</div>
 	</div>
 	<div class="text-xl">
-		<select bind:value={ayah} on:change={() => window.location.href = `/${data.params.surah}/${ayah}`}>
+		<select bind:value={ayah} on:change={() => window.location.href = `/${data.params.surah}/${ayah}`} class="bg-white">
 			<option></option>
 			{#each [...Array(data.surah.numAyahs).keys()] as num}
 				<option value={num+1} >
@@ -56,19 +78,19 @@
 <div class="py-24 min-h-screen flex flex-col gap-12 p-4">
 	<div class="bg-white flex flex-col gap-12 py-6 px-3 rounded-md">
 		<div class="flex flex-row-reverse flex-wrap gap-4">
-			{#each data.ayah.words as word, index}
-				<div class={`${index <= counter ? 'text-neutral-800' : 'text-neutral-300'}`}>
-					<div class="font-bold text-6xl text-right">
-						{word.arabic ?? word}
+			{#each data.ayah as word, index}
+				<div class={`${index < counter ? 'text-neutral-800' : 'text-neutral-300'}`}>
+					<div id={`word-${index+1}`} class="font-bold text-6xl text-right leading-loose">
+						{word.arabic}
 					</div>
 				</div>
 			{/each}
 		</div>
 		<div class="flex flex-row flex-wrap">
-			{#each data.ayah.words as word, index}
+			{#each data.ayah as word, index}
 				<div class={`${index <= counter ? 'text-neutral-800' : 'text-neutral-300'}`}>
 					<div class="font-bold text-6xl text-right">
-						{word.transliteration ?? ''}
+						{word.transliteration}
 					</div>
 				</div>
 			{/each}
@@ -76,13 +98,13 @@
 	</div>
 </div>
 
-<div class="max-w-lg mx-auto fixed bottom-0 left-0 right-0 h-16 bg-white flex flex-row justify-between items-center gap-2 px-3 border-t-4 border-green-500">
+<div class="max-w-lg mx-auto fixed z-30 bottom-0 left-0 right-0 h-16 bg-white flex flex-row justify-between items-center gap-2 px-3 border-t-4 border-green-500">
 	<div on:click={previousAyah} class={`cursor-pointer p-2 ${parseInt(data.params.ayah) > 1 ? 'text-neutral-900' : 'text-neutral-400'}`}>
 		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
 		  <path stroke-linecap="round" stroke-linejoin="round" d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5" />
 		</svg>
 	</div>
-	<div on:click={decreaseCounter} class={`cursor-pointer p-2 ${counter > 0 ? 'text-neutral-900' : 'text-neutral-400'}`}>
+	<div on:click={decreaseCounter} class="cursor-pointer p-2 text-neutral-900">
 		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
 		  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
 		</svg>
@@ -94,7 +116,7 @@
 			</svg>
 		</div>
 	</div>
-	<div on:click={increaseCounter} class={`cursor-pointer p-2 ${counter < data.ayah.words.length - 1 ? 'text-neutral-900' : 'text-neutral-400'}`}>
+	<div on:click={increaseCounter} class="cursor-pointer p-2 text-neutral-900">
 		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
 		  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
 		</svg>
