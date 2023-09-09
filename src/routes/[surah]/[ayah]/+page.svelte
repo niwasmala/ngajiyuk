@@ -76,7 +76,7 @@
 </div>
 
 <div class="py-24 min-h-screen flex flex-col gap-12 p-4">
-	<div class="bg-white flex flex-col gap-12 py-6 px-3 rounded-md">
+	<div class="bg-white flex flex-col gap-12 py-6 px-3">
 		<div class="flex flex-row-reverse flex-wrap gap-4">
 			{#each data.ayah as word, index}
 				<div class={`${index < counter ? 'text-neutral-800' : 'text-neutral-300'}`}>

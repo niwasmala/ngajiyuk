@@ -84,7 +84,7 @@
 
 <div class="py-24 min-h-screen flex flex-col gap-4 p-4">
 	{#each Object.entries(data.ayah) as [index, ayah]}
-		<a id={`ayah-${index}`} href={`/${data.params.surah}/${index}`} class="relative bg-white px-4 py-2 rounded-md flex flex-col gap-0">
+		<a id={`ayah-${index}`} href={`/${data.params.surah}/${index}`} class="relative bg-white px-4 py-2 flex flex-col gap-0">
 			<div class="absolute text-xs w-8 h-8 bg-green-500 left-0 top-0 flex items-center justify-center text-white">
 				{index}
 			</div>
