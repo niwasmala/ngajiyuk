@@ -92,7 +92,7 @@
 	</div>
 </div>
 
-<div class="py-24 min-h-screen flex flex-col gap-12 p-4">
+<div class="pt-24 pb-28 min-h-screen flex flex-col gap-12 p-4">
 	<div class="bg-white flex flex-col gap-12 py-6 px-3">
 		<div class="flex flex-row-reverse flex-wrap gap-4">
 			{#each data.ayah as word, index}
@@ -109,7 +109,7 @@
 	</div>
 </div>
 
-<div class="max-w-lg mx-auto fixed z-30 bottom-0 left-0 right-0 h-16 bg-white flex flex-row justify-between items-center gap-2 px-3 border-t-4 border-green-500">
+<div class="max-w-lg mx-auto fixed z-30 bottom-0 left-0 right-0 h-20 bg-white flex flex-row justify-between items-center gap-2 px-3 border-t-4 border-green-500">
 	<div on:click={previousAyah} class={`cursor-pointer p-2 ${parseInt(data.params.ayah) > 1 ? 'text-neutral-900' : 'text-neutral-400'}`}>
 		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
 		  <path stroke-linecap="round" stroke-linejoin="round" d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5" />

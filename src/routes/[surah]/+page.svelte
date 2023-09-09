@@ -74,7 +74,7 @@
 	const previousAyah = () => {		
 		if (counter > 1) {
 			counter--
-			
+
 			audioElement.load()
 			if (audioPlaying) {
 				audioElement.play()
@@ -109,7 +109,7 @@
 	</div>
 </div>
 
-<div class="py-24 min-h-screen flex flex-col gap-4 p-4">
+<div class="pt-24 pb-28 min-h-screen flex flex-col gap-4 p-4">
 	{#each Object.entries(data.ayah) as [index, ayah]}
 		<a id={`ayah-${index}`} href={`/${data.params.surah}/${index}`} class="relative bg-white px-4 py-2 flex flex-col gap-0">
 			<div class="absolute text-xs w-8 h-8 bg-green-500 left-0 top-0 flex items-center justify-center text-white">
@@ -132,7 +132,7 @@
 	{/each}
 </div>
 
-<div class="max-w-lg mx-auto fixed z-30 bottom-0 left-0 right-0 h-16 bg-white flex flex-row justify-between items-center gap-2 px-3 border-t-4 border-green-500">
+<div class="max-w-lg mx-auto fixed z-30 bottom-0 left-0 right-0 h-20 bg-white flex flex-row justify-between items-center gap-2 px-3 border-t-4 border-green-500">
 	<div on:click={previousAyah} class={`cursor-pointer p-2 ${counter > 1 ? 'text-neutral-900' : 'text-neutral-400'}`}>
 		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
 			<path stroke-linecap="round" stroke-linejoin="round" d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5" />
