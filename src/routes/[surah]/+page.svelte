@@ -176,7 +176,7 @@
 			<div class="absolute text-xs w-8 h-8 bg-green-500 left-0 top-0 flex items-center justify-center text-white">
 				{index}
 			</div>
-			<div class={`self-end flex flex-wrap flex-row-reverse gap-2 font-bold text-5xl pl-4 py-3 text-right leading-loose ${index <= counter ? 'text-neutral-800' : 'text-neutral-300'}`}>
+			<div class={`self-end flex flex-wrap flex-row-reverse gap-2 font-bold text-5xl pl-4 py-3 text-right leading-loose ${parseInt(index) === counter ? 'text-neutral-800' : 'text-neutral-300'}`}>
 				{#each ayah.arabic as word, idx}
 					<div id={`ayah-${index}-${idx}`} class={`${(parseInt(index) === counter && idx < words) || (parseInt(index) !== counter && idx < minWords) ? 'flex flex-col items-center' : 'hidden'}`}>
 						{ayah.arabic[idx]}
