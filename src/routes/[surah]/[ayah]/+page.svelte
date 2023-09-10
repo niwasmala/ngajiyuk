@@ -12,15 +12,24 @@
 
 	$: audioName = ("000" + data.params.surah).slice(-3) + ("000" + data.params.ayah).slice(-3)
 
-	let interval, timer = 0
+	let interval, timer = 0, timerAdd = 100
+
+	let debugTimer = false
+	let stopwatch = [0]
+	const addStopwatch = () => {
+		stopwatch.push(timer)
+		console.log(JSON.stringify(stopwatch))
+	}
 
 	const playAudio = () => {
 		if (!audioPlaying) {
 			setCounter(1)
 			audioElement.play()
+			audioPlaying = true
 
 			const marker = data.ayah.marker;
 			if (marker.length > 0) {
+				timer = 0
 				interval = window.setInterval(() => {
 					let lastMarker
 					marker.forEach((m, i) => {
@@ -30,23 +39,25 @@
 					})
 
 					setCounter(lastMarker+1)
-					timer += 500
+					timer += timerAdd
 
 					if (lastMarker >= marker.length) {
 						timer = 0
 						if (interval) window.clearInterval(interval)
 					}
-				}, 500)
+				}, timerAdd)
 			}			
 		} else {
-			audioElement.currentTime = 0
-			audioElement.pause()
+			if (debugTimer) {
+				addStopwatch()
+			} else {
+				audioPlaying = false
+				audioElement.currentTime = 0
+				audioElement.pause()
 
-			timer = 0
-			if (interval) window.clearInterval(interval)
+				if (interval) window.clearInterval(interval)
+			}
 		}
-
-		audioPlaying = !audioPlaying
 	}
 
 	const setCounter = (c) => {
@@ -100,7 +111,12 @@
 		</a>
 
 		<div class="text-xl font-bold">
-			{data.surah.nameEn}
+			{data.surah.nameEn} 
+			{#if debugTimer}
+				<span>
+					{timer}
+				</span>
+			{/if}
 		</div>
 	</div>
 	<div class="text-xl">
@@ -125,6 +141,11 @@
 						<div class="text-lg text-center">
 							{data.ayah.latin[index]}
 						</div>
+						{#if debugTimer}
+							<div class="text-lg text-center">
+								{data.ayah.marker[index]}
+							</div>
+						{/if}
 					</div>
 				</div>
 			{/each}
@@ -146,8 +167,8 @@
 	<div class="w-20 h-20 relative">
 		<div on:click={playAudio} class={`cursor-pointer absolute w-full h-full flex items-center justify-center rounded-full -top-8 text-white ${audioPlaying ? 'bg-red-500' : 'bg-green-500' }`}>
 			{#if audioPlaying}
-				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
-				  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-10 h-10">
+				  <path fill-rule="evenodd" d="M4.5 7.5a3 3 0 013-3h9a3 3 0 013 3v9a3 3 0 01-3 3h-9a3 3 0 01-3-3v-9z" clip-rule="evenodd" />
 				</svg>
 			{:else}
 				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
