@@ -1,8 +1,10 @@
 <script>
 	export let data
 
+	const minWords = 1
+
 	let counter = 1
-	let words = 2
+	let words = minWords
 
 	let audioName
 	let audioElement
@@ -10,68 +12,125 @@
 
 	$: audioName = ("000" + data.params.surah).slice(-3) + ("000" + counter).slice(-3)
 
+	let interval, timer = 0, timerAdd = 100
+
 	const playAudio = () => {
 		if (!audioPlaying) {
+			audioPlaying = true
 			audioElement.play()
+
+			const marker = data.ayah[counter].marker;
+			if (marker.length > 0) {
+				if (interval) window.clearInterval(interval)
+
+				timer = 0
+				interval = window.setInterval(() => {
+					let lastMarker
+					marker.forEach((m, i) => {
+						if (timer >= m) {
+							lastMarker = i
+						}
+					})
+
+					setWord(lastMarker+1)
+					timer += timerAdd
+
+					if (lastMarker >= marker.length) {
+						timer = 0
+						if (interval) window.clearInterval(interval)
+					}
+				}, timerAdd)
+			}
 		} else {
+			audioPlaying = false
 			audioElement.currentTime = 0
 			audioElement.pause()
-		}
 
-		audioPlaying = !audioPlaying
+			if (interval) window.clearInterval(interval)
+		}
+	}
+
+	const setWord = (w) => {
+		words = w
+
+		window.setTimeout(() => {
+			const element = document.getElementById(`ayah-${counter}-${words-1}`)
+			if (element) {
+				element.scrollIntoView({
+					behavior: 'smooth',
+					block: 'center',
+					inline: 'center',
+				});
+			}
+		}, 100)
 	}
 
 	const increaseWords = () => {
-		words++
-
-		const element = document.getElementById(`ayah-${counter}`)
-		if (element) {
-			element.scrollIntoView({
-				behavior: 'smooth',
-				block: 'center',
-				inline: 'center',
-			});
+		if (words < data.ayah[counter].arabic.length) {
+			words++
+		} else {
+			nextAyah()
 		}
+
+		window.setTimeout(() => {
+			const element = document.getElementById(`ayah-${counter}-${words-1}`)
+			if (element) {
+				element.scrollIntoView({
+					behavior: 'smooth',
+					block: 'center',
+					inline: 'center',
+				});
+			}
+		}, 100)
 	}
 
 	const decreaseWords = () => {
-		if (words > 2) {
+		if (words > minWords) {
 			words--
 		}
 
-		const element = document.getElementById(`ayah-${counter}`)
-		if (element) {
-			element.scrollIntoView({
-				behavior: 'smooth',
-				block: 'center',
-				inline: 'center',
-			});
-		}
+		window.setTimeout(() => {
+			const element = document.getElementById(`ayah-${counter}-${words}`)
+			if (element) {
+				element.scrollIntoView({
+					behavior: 'smooth',
+					block: 'center',
+					inline: 'center',
+				});
+			}
+		}, 100)
 	}
 
 	const nextAyah = () => {
+		words = minWords
+
 		if (counter < data.surah.numAyahs) {
 			counter++
 
 			audioElement.load()
 			if (audioPlaying) {
-				audioElement.play()
+				audioPlaying = false
+				playAudio()
 			}
 		} else {
 			window.location.href = `/${parseInt(data.params.surah)+1}`
 		}
 
-		const element = document.getElementById(`ayah-${counter}`)
-		if (element) {
-			element.scrollIntoView({
-				behavior: 'smooth',
-				block: 'center',
-				inline: 'center',
-			});
-		}
+		window.setTimeout(() => {
+			const element = document.getElementById(`ayah-${counter}`)
+			if (element) {
+				element.scrollIntoView({
+					behavior: 'smooth',
+					block: 'center',
+					inline: 'center',
+				})
+			}
+		}, 100)
 	}
 
-	const previousAyah = () => {		
+	const previousAyah = () => {
+		words = minWords
+
 		if (counter > 1) {
 			counter--
 
@@ -81,14 +140,16 @@
 			}
 		}
 
-		const element = document.getElementById(`ayah-${counter}`)
-		if (element) {
-			element.scrollIntoView({
-				behavior: 'smooth',
-				block: 'center',
-				inline: 'center',
-			});
-		}
+		window.setTimeout(() => {
+			const element = document.getElementById(`ayah-${counter}`)
+			if (element) {
+				element.scrollIntoView({
+					behavior: 'smooth',
+					block: 'center',
+					inline: 'center',
+				})
+			}
+		}, 100)
 	}
 </script>
 
@@ -117,7 +178,7 @@
 			</div>
 			<div class={`self-end flex flex-wrap flex-row-reverse gap-2 font-bold text-5xl pl-4 py-3 text-right leading-loose ${index <= counter ? 'text-neutral-800' : 'text-neutral-300'}`}>
 				{#each ayah.arabic as word, idx}
-					<div class={`${idx < words ? 'flex flex-col items-center' : 'hidden'}`}>
+					<div id={`ayah-${index}-${idx}`} class={`${(parseInt(index) === counter && idx < words) || (parseInt(index) !== counter && idx < minWords) ? 'flex flex-col items-center' : 'hidden'}`}>
 						{ayah.arabic[idx]}
 						<div class="text-sm">
 							{ayah.latin[idx]}
@@ -125,7 +186,7 @@
 					</div>
 				{/each}
 				<div>
-					{ayah.arabic.length > words ? '...' : ''}
+					{(parseInt(index) === counter && ayah.arabic.length > words) || (parseInt(index) !== counter && ayah.arabic.length > minWords) ? '...' : ''}
 				</div>
 			</div>
 		</a>
@@ -138,7 +199,7 @@
 			<path stroke-linecap="round" stroke-linejoin="round" d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5" />
 		</svg>
 	</div>
-	<div on:click={decreaseWords} class={`cursor-pointer p-2 ${words > 2 ? 'text-neutral-900' : 'text-neutral-400'}`}>
+	<div on:click={decreaseWords} class={`cursor-pointer p-2 ${words > minWords ? 'text-neutral-900' : 'text-neutral-400'}`}>
 		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
 		  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
 		</svg>

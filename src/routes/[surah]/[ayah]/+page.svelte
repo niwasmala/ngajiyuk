@@ -46,7 +46,7 @@
 						if (interval) window.clearInterval(interval)
 					}
 				}, timerAdd)
-			}			
+			}
 		} else {
 			if (debugTimer) {
 				addStopwatch()
