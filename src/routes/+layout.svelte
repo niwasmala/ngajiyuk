@@ -2,8 +2,6 @@
   import "../app.css";
   import { invalidate } from '$app/navigation'
   import { onMount } from 'svelte'
-
-  export let data
 </script>
 
 <svelte:head>
