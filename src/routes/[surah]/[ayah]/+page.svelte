@@ -1,5 +1,6 @@
 <script>
-	import { onMount } from "svelte";
+	import { onMount } from "svelte"
+	import Fuse from "fuse.js"
 
 	export let data
 
@@ -9,6 +10,7 @@
 	let audioName
 	let audioElement
 	let audioPlaying = false
+	let audioRecording = false
 
 	$: audioName = ("000" + data.params.surah).slice(-3) + ("000" + data.params.ayah).slice(-3)
 
@@ -56,6 +58,72 @@
 				audioElement.pause()
 
 				if (interval) window.clearInterval(interval)
+			}
+		}
+	}
+
+	let recognition, lastTranscript = ''
+
+	const removeDiacritics = (text) => {
+	  return text.replace(/[\u064B-\u065F\u0670\u0674\u06D4\u06D5-\u06ED]/g, '');
+	}
+
+	onMount(() => {
+		if ('webkitSpeechRecognition' in window) {
+			recognition = new webkitSpeechRecognition()
+			recognition.lang = 'ar-SA'
+			recognition.continuous = true
+			recognition.interimResults = true
+			recognition.maxAlternatives = 1
+
+			recognition.onstart = () => {
+				lastTranscripts = ''
+      };
+
+			recognition.onresult = (event) => {
+				const transcript = event.results[event.results.length-1][0].transcript
+
+				if (transcript) {
+					lastTranscript = transcript
+
+					const normalizedWord = removeDiacritics(data.ayah.arabic[counter-1].trim())
+					const normalizedTranscript = removeDiacritics(lastTranscript.trim().split('ي').join('ىۡ'))
+
+					const fuse = new Fuse([normalizedTranscript], {
+				    includeScore: true,
+				    ignoreLocation: true,
+				  })
+				  const result = fuse.search(normalizedWord)
+
+					if (normalizedWord === normalizedTranscript || (result.length > 0 && result[0].score > 0.1)) {
+						increaseCounter()
+					}
+				}
+		  }
+
+		  recognition.onend = () => {
+		  	if (audioRecording) {
+		  		recognition.start()
+		  	}
+		  }
+		}
+	})
+
+	const recordAudio = () => {
+		if (!audioRecording) {
+			if (recognition) {
+				audioRecording = true
+				recognition.start()
+			} else {
+				alert('Speech recognition not supported')
+			}
+		} else {
+			if (recognition) {
+				audioRecording = false
+				recognition.stop()
+				// lastTranscript = ''
+			} else {
+				alert('Speech recognition not supported')
 			}
 		}
 	}
@@ -111,7 +179,17 @@
 		</a>
 
 		<div class="text-xl font-bold">
-			{data.surah.nameEn} 
+			{data.params.surah}. {data.surah.nameEn}
+
+			<select bind:value={ayah} on:change={() => window.location.href = `/${data.params.surah}/${ayah}`} class="bg-white">
+				<option></option>
+				{#each [...Array(data.surah.numAyahs).keys()] as num}
+					<option value={num+1} >
+						Ayat {num+1}
+					</option>
+				{/each}
+			</select>
+			
 			{#if debugTimer}
 				<span>
 					{timer}
@@ -119,19 +197,22 @@
 			{/if}
 		</div>
 	</div>
-	<div class="text-xl">
-		<select bind:value={ayah} on:change={() => window.location.href = `/${data.params.surah}/${ayah}`} class="bg-white">
-			<option></option>
-			{#each [...Array(data.surah.numAyahs).keys()] as num}
-				<option value={num+1} >
-					Ayat {num+1}
-				</option>
-			{/each}
-		</select>
+	<div>
+		<div on:click={playAudio} class={`cursor-pointer p-2 w-full h-full flex items-center justify-center rounded-full -top-8 text-white ${audioPlaying ? 'bg-red-500' : 'bg-green-500' }`}>
+			{#if audioPlaying}
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+				  <path fill-rule="evenodd" d="M4.5 7.5a3 3 0 013-3h9a3 3 0 013 3v9a3 3 0 01-3 3h-9a3 3 0 01-3-3v-9z" clip-rule="evenodd" />
+				</svg>
+			{:else}
+				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+				  <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+				</svg>
+			{/if}
+		</div>
 	</div>
 </div>
 
-<div class="pt-24 pb-28 min-h-screen flex flex-col gap-12 p-4">
+<div class={`pt-24 min-h-screen flex flex-col gap-12 p-4 ${audioRecording ? 'pb-44' : 'pb-28'}`}>
 	<div class="bg-white flex flex-col gap-12 py-6 px-3">
 		<div class="flex flex-row-reverse flex-wrap gap-4">
 			{#each data.ayah.arabic as word, index}
@@ -153,6 +234,14 @@
 	</div>
 </div>
 
+{#if audioRecording}
+	<div class="max-w-lg mx-auto fixed z-20 bottom-20 left-0 right-0 h-20 bg-white flex flex-row justify-between items-center gap-2 px-3 border-t-4 border-green-500">
+		<div class="w-full bg-white p-3 text-3xl font-neutral-800 flex flex-row-reverse flex-wrap"> 
+			{lastTranscript}
+		</div>
+	</div>
+{/if}
+
 <div class="max-w-lg mx-auto fixed z-30 bottom-0 left-0 right-0 h-20 bg-white flex flex-row justify-between items-center gap-2 px-3 border-t-4 border-green-500">
 	<div on:click={previousAyah} class={`cursor-pointer p-2 ${parseInt(data.params.ayah) > 1 ? 'text-neutral-900' : 'text-neutral-400'}`}>
 		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
@@ -165,17 +254,27 @@
 		</svg>
 	</div>
 	<div class="w-20 h-20 relative">
-		<div on:click={playAudio} class={`cursor-pointer absolute w-full h-full flex items-center justify-center rounded-full -top-8 text-white ${audioPlaying ? 'bg-red-500' : 'bg-green-500' }`}>
-			{#if audioPlaying}
+		{#if recognition}
+			<div on:click={recordAudio} class={`cursor-pointer absolute w-full h-full flex items-center justify-center rounded-full -top-8 text-white ${audioRecording ? 'bg-red-500' : 'bg-green-500' }`}>
+				{#if audioRecording}
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-10 h-10">
+					  <path fill-rule="evenodd" d="M4.5 7.5a3 3 0 013-3h9a3 3 0 013 3v9a3 3 0 01-3 3h-9a3 3 0 01-3-3v-9z" clip-rule="evenodd" />
+					</svg>
+				{:else}
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-10 h-10">
+					  <path d="M8.25 4.5a3.75 3.75 0 117.5 0v8.25a3.75 3.75 0 11-7.5 0V4.5z" />
+					  <path d="M6 10.5a.75.75 0 01.75.75v1.5a5.25 5.25 0 1010.5 0v-1.5a.75.75 0 011.5 0v1.5a6.751 6.751 0 01-6 6.709v2.291h3a.75.75 0 010 1.5h-7.5a.75.75 0 010-1.5h3v-2.291a6.751 6.751 0 01-6-6.709v-1.5A.75.75 0 016 10.5z" />
+					</svg>
+				{/if}
+			</div>
+		{:else}
+			<div class="cursor-pointer absolute w-full h-full flex items-center justify-center rounded-full -top-8 text-white bg-neutral-800">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-10 h-10">
-				  <path fill-rule="evenodd" d="M4.5 7.5a3 3 0 013-3h9a3 3 0 013 3v9a3 3 0 01-3 3h-9a3 3 0 01-3-3v-9z" clip-rule="evenodd" />
+				  <path d="M8.25 4.5a3.75 3.75 0 117.5 0v8.25a3.75 3.75 0 11-7.5 0V4.5z" />
+				  <path d="M6 10.5a.75.75 0 01.75.75v1.5a5.25 5.25 0 1010.5 0v-1.5a.75.75 0 011.5 0v1.5a6.751 6.751 0 01-6 6.709v2.291h3a.75.75 0 010 1.5h-7.5a.75.75 0 010-1.5h3v-2.291a6.751 6.751 0 01-6-6.709v-1.5A.75.75 0 016 10.5z" />
 				</svg>
-			{:else}
-				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
-				  <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
-				</svg>
-			{/if}
-		</div>
+			</div>
+		{/if}
 	</div>
 	<div on:click={increaseCounter} class="cursor-pointer p-2 text-neutral-900">
 		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">

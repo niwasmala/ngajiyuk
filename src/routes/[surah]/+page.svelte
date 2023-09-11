@@ -162,11 +162,11 @@
 		</a>
 
 		<div class="text-xl font-bold">
-			{data.surah.nameEn}
+			{data.params.surah}. {data.surah.nameEn} ({data.surah.numAyahs} ayat)
 		</div>
 	</div>
 	<div class="text-xl">
-		{data.surah.numAyahs} ayat
+		
 	</div>
 </div>
 
