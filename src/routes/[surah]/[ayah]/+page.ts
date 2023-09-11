@@ -3,7 +3,7 @@ import surah from '$lib/data/surah.json';
 import { loadWords } from '$lib/data/words';
 
 /** @type {import('./$types').PageLoad} */
-export async function load({ params }) {
+export async function load({ params, url }) {
   if (!surah[params.surah]) {
     throw error(404, 'Not found');
   }
@@ -17,7 +17,10 @@ export async function load({ params }) {
   }
 
   return {
-    params,
+    params: {
+      ...params,
+      mode: url.searchParams.get('mode'),
+    },
     surah: surah[params.surah],
     ayah: ayah[params.ayah],
   }
