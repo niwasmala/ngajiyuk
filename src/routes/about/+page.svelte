@@ -87,7 +87,7 @@
         Sponsors are always welcome as I intend to keep this application free and open source (but <a target="_blank" href="https://wa.me/6288803069410?text=I'm interested in customizing NgajiYuk!" class="text-underline text-green-500 cursor-pointer font-bold">open for special customization</a> for the needs of Islamic schools or Islamic boarding schools with additional donations, e.g. separate server which can store their students voice recording with the school's logo and brand).
       </div>
       <div>
-        Volunteers are also welcomed as we still need to do some manual task such as create words-by-words transliteration, create a subtitle time marker when audio is played, improving design, maintaining code and infrastructure, etc. If there is a donation, inshaa Allah, there will be compensation. But hopefully this can be a charity for us together.
+        Volunteers are also welcomed as we still need to do some manual task such as create words-by-words transliteration, create a subtitle time marker when audio is played, improving design, maintaining code and infrastructure, etc. If there is a donation, inshaa Allah, there will be compensation. But hopefully this can be a amal jariyah for us together.
       </div>
     </div>
   </div>

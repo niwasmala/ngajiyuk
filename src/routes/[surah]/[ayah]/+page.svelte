@@ -262,7 +262,7 @@
 	</div>
 </div>
 
-<div class={`pt-24 min-h-screen flex flex-col gap-12 p-4 ${audioRecording ? 'pb-44' : 'pb-28'}`}>
+<div class="pt-24 min-h-screen flex flex-col gap-12 p-4 pb-44">
 	<div class="bg-white flex flex-col gap-12 py-6 px-3">
 		<div class="flex flex-row-reverse flex-wrap gap-4">
 			{#each data.ayah.arabic as word, index}
@@ -298,12 +298,12 @@
 </div>
 
 {#if audioRecording}
-	<div class="max-w-lg mx-auto fixed z-20 bottom-20 left-0 right-0 pb-12">
-		<div class="mx-10 bg-green-500/20 text-neutral-800 p-3 text-3xl"> 
+	<div class="max-w-lg mx-auto fixed z-20 bottom-10 left-0 right-0 pb-12">
+		<div class="mx-10 bg-green-100 text-neutral-800 p-3 text-3xl"> 
 			<div class="text-xs">
 				You say:
 			</div>
-			<div class="flex flex-row-reverse flex-wrap text-right">
+			<div class="flex flex-row-reverse flex-wrap text-right leading-loose">
 				{#each transcripts as transcript, index}
 					<div class={`${wordsCorrect[index] ? 'text-neutral-800' : 'text-red-500'}`}>
 						{transcript}

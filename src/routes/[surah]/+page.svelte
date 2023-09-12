@@ -106,10 +106,6 @@
 			counter++
 
 			audioElement.load()
-			if (audioPlaying) {
-				audioPlaying = false
-				playAudio()
-			}
 		} else {
 			window.location.href = `/${parseInt(data.params.surah)+1}`
 		}
@@ -149,6 +145,14 @@
 			}
 		}, 100)
 	}
+
+	const audioOnLoaded = () => {
+		timer = 0
+		if (audioPlaying) {
+			audioPlaying = false
+			playAudio()
+		}
+	}
 </script>
 
 <div class="max-w-lg mx-auto fixed z-30 top-0 left-0 right-0 p-4 flex flex-row justify-between items-center text-neutral-800 bg-white border-b-4 border-green-500">
@@ -176,7 +180,7 @@
 			</div>
 			<div class={`self-end flex flex-wrap flex-row-reverse gap-2 font-bold text-5xl pl-4 py-3 text-right leading-loose ${parseInt(index) === counter ? 'text-neutral-800' : 'text-neutral-300'}`}>
 				{#each ayah.arabic as word, idx}
-					<div id={`ayah-${index}-${idx}`} class={`${(parseInt(index) === counter && idx < words) || (parseInt(index) !== counter && idx < minWords) ? 'flex flex-col items-center' : 'hidden'}`}>
+					<div id={`ayah-${index}-${idx}`} class={`${(parseInt(index) === counter && idx < words) || (parseInt(index) < counter) || (parseInt(index) > counter && idx < minWords) ? 'flex flex-col items-center' : 'hidden'}`}>
 						{ayah.arabic[idx]}
 						<div class="text-sm">
 							{ayah.latin[idx]}
@@ -184,7 +188,7 @@
 					</div>
 				{/each}
 				<div>
-					{(parseInt(index) === counter && ayah.arabic.length > words) || (parseInt(index) !== counter && ayah.arabic.length > minWords) ? '...' : ''}
+					{(parseInt(index) === counter && ayah.arabic.length > words) || (parseInt(index) > counter && ayah.arabic.length > minWords) ? '...' : ''}
 				</div>
 			</div>
 		</a>
@@ -227,6 +231,6 @@
 	</div>
 </div>
 
-<audio bind:this={audioElement} on:loadeddata={() => timer = 0} on:ended={nextAyah}>
+<audio bind:this={audioElement} on:loadeddata={audioOnLoaded} on:ended={nextAyah}>
   <source src={`/audio/${audioName}.mp3`} type="audio/mpeg">
 </audio>
