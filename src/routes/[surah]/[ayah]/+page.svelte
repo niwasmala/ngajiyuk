@@ -4,7 +4,7 @@
 
 	export let data
 
-	let mode = data.params.mode ?? 'learn' // 'test'
+	let mode = data.params.mode ?? 'learn' // learn || test
 
 	let ayah = parseInt(data.params.ayah)
 	let counter = 1
@@ -228,16 +228,36 @@
 	<div class="bg-white flex flex-col gap-12 py-6 px-3">
 		<div class="flex flex-row-reverse flex-wrap gap-4">
 			{#each data.ayah.arabic as word, index}
-				<div class={`${mode === 'test' ? (index < counter-1 ? 'text-neutral-800' : 'invisible') : (index < counter ? 'text-neutral-800' : 'text-neutral-300')}`}>
+				<div class={`${(index < counter ? 'text-neutral-800' : 'text-neutral-300')}`}>
 					<div id={`word-${index+1}`} class="font-bold text-6xl text-right leading-loose">
-						{data.ayah.arabic[index]}
-						<div class="text-lg text-center">
-							{data.ayah.latin[index]}
-						</div>
-						{#if debugTimer}
+						{#if mode === 'test'}
+							{#if index < counter-1}
+								<div>
+									{data.ayah.arabic[index]}
+									<div class="text-lg text-center">
+										{data.ayah.latin[index]}
+									</div>
+									{#if debugTimer}
+										<div class="text-lg text-center">
+											{data.ayah.marker[index]}
+										</div>
+									{/if}
+								</div>
+							{:else}
+								<div class="">
+									___
+								</div>
+							{/if}
+						{:else}
+							{data.ayah.arabic[index]}
 							<div class="text-lg text-center">
-								{data.ayah.marker[index]}
+								{data.ayah.latin[index]}
 							</div>
+							{#if debugTimer}
+								<div class="text-lg text-center">
+									{data.ayah.marker[index]}
+								</div>
+							{/if}
 						{/if}
 					</div>
 				</div>

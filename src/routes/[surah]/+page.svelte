@@ -19,28 +19,26 @@
 			audioPlaying = true
 			audioElement.play()
 
-			const marker = data.ayah[counter].marker;
-			if (marker.length > 0) {
-				if (interval) window.clearInterval(interval)
+			const marker = data.ayah[counter].marker ?? [];
+			if (interval) window.clearInterval(interval)
 
-				timer = 0
-				interval = window.setInterval(() => {
-					let lastMarker
-					marker.forEach((m, i) => {
-						if (timer >= m) {
-							lastMarker = i
-						}
-					})
-
-					setWord(lastMarker+1)
-					timer += timerAdd
-
-					if (lastMarker >= marker.length) {
-						timer = 0
-						if (interval) window.clearInterval(interval)
+			timer = 0
+			interval = window.setInterval(() => {
+				let lastMarker
+				marker.forEach((m, i) => {
+					if (timer >= m) {
+						lastMarker = i
 					}
-				}, timerAdd)
-			}
+				})
+
+				setWord(lastMarker+1)
+				timer += timerAdd
+
+				if (lastMarker >= marker.length) {
+					timer = 0
+					if (interval) window.clearInterval(interval)
+				}
+			}, timerAdd)
 		} else {
 			audioPlaying = false
 			audioElement.currentTime = 0
@@ -229,6 +227,6 @@
 	</div>
 </div>
 
-<audio bind:this={audioElement} on:ended={nextAyah}>
+<audio bind:this={audioElement} on:loadeddata={() => timer = 0} on:ended={nextAyah}>
   <source src={`/audio/${audioName}.mp3`} type="audio/mpeg">
 </audio>
