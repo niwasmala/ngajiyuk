@@ -230,25 +230,7 @@
 			{#each data.ayah.arabic as word, index}
 				<div class={`${(index < counter ? 'text-neutral-800' : 'text-neutral-300')}`}>
 					<div id={`word-${index+1}`} class="font-bold text-6xl text-right leading-loose">
-						{#if mode === 'test'}
-							{#if index < counter-1}
-								<div>
-									{data.ayah.arabic[index]}
-									<div class="text-lg text-center">
-										{data.ayah.latin[index]}
-									</div>
-									{#if debugTimer}
-										<div class="text-lg text-center">
-											{data.ayah.marker[index]}
-										</div>
-									{/if}
-								</div>
-							{:else}
-								<div class="">
-									___
-								</div>
-							{/if}
-						{:else}
+						{#if mode === 'learn' || (mode === 'test' && index < counter - 1)}
 							{data.ayah.arabic[index]}
 							<div class="text-lg text-center">
 								{data.ayah.latin[index]}
@@ -258,6 +240,15 @@
 									{data.ayah.marker[index]}
 								</div>
 							{/if}
+						{:else}
+							<div class="border-b-2 border-neutral-800">
+								<div class="text-white">
+									{data.ayah.arabic[index]}
+									<div class="text-lg text-center">
+										{data.ayah.latin[index]}
+									</div>
+								</div>
+							</div>
 						{/if}
 					</div>
 				</div>
