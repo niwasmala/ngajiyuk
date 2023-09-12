@@ -7,7 +7,7 @@
 	let mode = data.params.mode ?? 'learn' // learn || test
 
 	let ayah = parseInt(data.params.ayah)
-	let counter = 1
+	let counter = mode === 'test' ? 0 : 1
 
 	let audioName
 	let audioElement
@@ -64,7 +64,11 @@
 		}
 	}
 
-	let recognition, lastTranscript = ''
+	let recognition, 
+			speechTimeout = undefined,
+			transcripts = [],
+			lastTranscript = '', 
+			wordsCorrect = data.ayah.arabic.map(i => false)
 
 	const removeDiacritics = (text) => {
 	  return text.replace(/[\u064B-\u065F\u0670\u0674\u06D4\u06D5-\u06ED]/g, '');
@@ -79,7 +83,8 @@
 			recognition.maxAlternatives = 1
 
 			recognition.onstart = () => {
-				lastTranscripts = ''
+				speechTimeout = undefined
+				transcripts = []
       };
 
 			recognition.onresult = (event) => {
@@ -88,18 +93,35 @@
 				if (transcript) {
 					lastTranscript = transcript
 
-					const normalizedWord = removeDiacritics(data.ayah.arabic[counter-1].trim())
-					const normalizedTranscript = removeDiacritics(lastTranscript.trim().split('ي').join('ىۡ'))
-
-					const fuse = new Fuse([normalizedTranscript], {
-				    includeScore: true,
-				    ignoreLocation: true,
-				  })
-				  const result = fuse.search(normalizedWord)
-
-					if (normalizedWord === normalizedTranscript || (result.length > 0 && result[0].score > 0.1)) {
-						increaseCounter()
+					if (speechTimeout !== undefined) {
+						console.log('cancel speechTimeout')
+						window.clearTimeout(speechTimeout)
+						speechTimeout = undefined
 					}
+
+					speechTimeout = window.setTimeout(() => {
+						console.log('insideTimeout', lastTranscript)
+						transcripts = lastTranscript.split(' ')
+
+						for (let i = 0; i < transcripts.length; i++) {
+							const normalizedWord = removeDiacritics(data.ayah.arabic[counter].trim())
+							const normalizedTranscript = removeDiacritics(transcripts[i].trim())
+
+							const fuse = new Fuse([normalizedTranscript], {
+						    includeScore: true,
+						    ignoreLocation: true,
+						  })
+						  const result = fuse.search(normalizedWord)
+
+						  console.log(counter, i, normalizedWord, normalizedTranscript, normalizedWord === normalizedTranscript, result?.[0]?.score)
+							if (normalizedWord === normalizedTranscript || (result.length > 0 && result[0].score > 0.2)) {
+								wordsCorrect[counter] = true
+							} else {
+								wordsCorrect[counter] = false
+							}
+							increaseCounter()
+						}
+					}, 1000)
 				}
 		  }
 
@@ -122,8 +144,9 @@
 		} else {
 			if (recognition) {
 				audioRecording = false
+				transcripts = []
+				lastTranscript = ''
 				recognition.stop()
-				// lastTranscript = ''
 			} else {
 				alert('Speech recognition not supported')
 			}
@@ -132,6 +155,10 @@
 
 	const setCounter = (c) => {
 		counter = c
+
+		data.wordsDisplayed = data.wordsDisplayed.map((item, index) => {
+			return index < counter ? true : false;
+		})
 
 		const element = document.getElementById(`word-${counter}`)
 		if (element) {
@@ -152,7 +179,7 @@
 	}
 
 	const decreaseCounter = () => {
-		if (counter > 1) {
+		if ((mode === 'learn' && counter > 1) || (mode === 'test' && counter > 0)) {
 			setCounter(counter-1)
 		} else {
 			previousAyah()
@@ -178,6 +205,17 @@
 		timer = 0
 		if (interval) window.clearInterval(interval)
 		if (debugTimer) alert(JSON.stringify(stopwatch))
+	}
+
+	const changeMode = () => {
+		if (mode === 'learn') {
+			mode = 'test'
+			setCounter(0)
+			wordsCorrect = data.ayah.arabic.map(i => false)
+		} else {
+			mode = 'learn'
+			setCounter(1)
+		}
 	}
 </script>
 
@@ -209,7 +247,7 @@
 		</div>
 	</div>
 	<div>
-		<div on:click={() => mode = (mode === 'learn' ? 'test' : 'learn')} class={`cursor-pointer w-full h-full flex items-center justify-center rounded-full -top-8 text-neutral-800 p-2`}>
+		<div on:click={changeMode} class={`cursor-pointer w-full h-full flex items-center justify-center rounded-full -top-8 text-neutral-800 p-2`}>
 			{#if mode === 'test'}
 				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
 				  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
@@ -228,12 +266,14 @@
 	<div class="bg-white flex flex-col gap-12 py-6 px-3">
 		<div class="flex flex-row-reverse flex-wrap gap-4">
 			{#each data.ayah.arabic as word, index}
-				<div class={`${(index < counter ? 'text-neutral-800' : 'text-neutral-300')}`}>
+				<div class={`${data.wordsDisplayed[index] ? 'text-neutral-800' : 'text-neutral-300'}`}>
 					<div id={`word-${index+1}`} class="font-bold text-6xl text-right leading-loose">
-						{#if mode === 'learn' || (mode === 'test' && index < counter - 1)}
-							{data.ayah.arabic[index]}
-							<div class="text-lg text-center">
-								{data.ayah.latin[index]}
+						{#if mode === 'learn' || (mode === 'test' && data.wordsDisplayed[index])}
+							<div class={`${mode === 'test' && !wordsCorrect[index] ? 'text-red-500' : ''}`}>
+								{data.ayah.arabic[index]}
+								<div class="text-lg text-center">
+									{data.ayah.latin[index]}
+								</div>
 							</div>
 							{#if debugTimer}
 								<div class="text-lg text-center">
@@ -241,7 +281,7 @@
 								</div>
 							{/if}
 						{:else}
-							<div class="border-b-2 border-neutral-800">
+							<div class={`border-b-2 ${index === counter ? 'border-green-500' : 'border-neutral-800'}`}>
 								<div class="text-white">
 									{data.ayah.arabic[index]}
 									<div class="text-lg text-center">
@@ -258,9 +298,18 @@
 </div>
 
 {#if audioRecording}
-	<div class="max-w-lg mx-auto fixed z-20 bottom-20 left-0 right-0 h-20 bg-white flex flex-row justify-between items-center gap-2 px-3 border-t-4 border-green-500">
-		<div class="w-full bg-white p-3 text-3xl font-neutral-800 flex flex-row-reverse flex-wrap"> 
-			{lastTranscript}
+	<div class="max-w-lg mx-auto fixed z-20 bottom-20 left-0 right-0 pb-12">
+		<div class="mx-10 bg-green-500/20 text-neutral-800 p-3 text-3xl"> 
+			<div class="text-xs">
+				You say:
+			</div>
+			<div class="flex flex-row-reverse flex-wrap text-right">
+				{#each transcripts as transcript, index}
+					<div class={`${wordsCorrect[index] ? 'text-neutral-800' : 'text-red-500'}`}>
+						{transcript}
+					</div>
+				{/each}
+			</div>
 		</div>
 	</div>
 {/if}
