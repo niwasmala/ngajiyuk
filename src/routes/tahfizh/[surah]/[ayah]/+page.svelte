@@ -94,13 +94,11 @@
 					lastTranscript = transcript
 
 					if (speechTimeout !== undefined) {
-						console.log('cancel speechTimeout')
 						window.clearTimeout(speechTimeout)
 						speechTimeout = undefined
 					}
 
 					speechTimeout = window.setTimeout(() => {
-						console.log('insideTimeout', lastTranscript)
 						transcripts = lastTranscript.split(' ')
 
 						for (let i = 0; i < transcripts.length; i++) {
@@ -113,7 +111,6 @@
 						  })
 						  const result = fuse.search(normalizedWord)
 
-						  console.log(counter, i, normalizedWord, normalizedTranscript, normalizedWord === normalizedTranscript, result?.[0]?.score)
 							if (normalizedWord === normalizedTranscript || (result.length > 0 && result[0].score > 0.2)) {
 								wordsCorrect[counter] = true
 							} else {
